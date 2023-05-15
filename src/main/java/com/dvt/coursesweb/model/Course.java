@@ -1,7 +1,7 @@
-package com.dvt.joblisting.model;
+package com.dvt.coursesweb.model;
 
-import com.dvt.joblisting.model.submodel.Lecture;
-import com.dvt.joblisting.model.submodel.Poster;
+import com.dvt.coursesweb.model.submodel.Lecture;
+import com.dvt.coursesweb.model.submodel.Poster;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import org.bson.types.ObjectId;

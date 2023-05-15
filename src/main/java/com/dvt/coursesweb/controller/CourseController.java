@@ -1,14 +1,14 @@
-package com.dvt.joblisting.controller;
+package com.dvt.coursesweb.controller;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.dvt.joblisting.model.Course;
-import com.dvt.joblisting.model.submodel.Lecture;
-import com.dvt.joblisting.model.submodel.Poster;
-import com.dvt.joblisting.model.submodel.Video;
-import com.dvt.joblisting.repository.CourseRepository;
-import com.dvt.joblisting.repository.SearchRepository;
-import com.dvt.joblisting.ultis.ErrorHandler;
+import com.dvt.coursesweb.model.Course;
+import com.dvt.coursesweb.model.submodel.Lecture;
+import com.dvt.coursesweb.model.submodel.Poster;
+import com.dvt.coursesweb.model.submodel.Video;
+import com.dvt.coursesweb.repository.CourseRepository;
+import com.dvt.coursesweb.repository.SearchRepository;
+import com.dvt.coursesweb.ultis.ErrorHandler;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

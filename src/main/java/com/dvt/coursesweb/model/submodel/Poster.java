@@ -1,4 +1,4 @@
-package com.dvt.joblisting.model.submodel;
+package com.dvt.coursesweb.model.submodel;
 
 public class Poster {
     private String public_id;

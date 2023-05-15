@@ -1,15 +1,12 @@
-package com.dvt.joblisting.controller;
+package com.dvt.coursesweb.controller;
 
-import com.dvt.joblisting.service.UserSevice;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.dvt.coursesweb.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;

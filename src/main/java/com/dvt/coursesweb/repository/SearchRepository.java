@@ -1,12 +1,9 @@
-package com.dvt.joblisting.repository;
+package com.dvt.coursesweb.repository;
 
-import com.dvt.joblisting.model.Course;
+import com.dvt.coursesweb.model.Course;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 

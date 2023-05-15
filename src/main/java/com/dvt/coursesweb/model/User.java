@@ -1,10 +1,8 @@
-package com.dvt.joblisting.model;
+package com.dvt.coursesweb.model;
 
-import com.dvt.joblisting.model.submodel.Avatar;
-import com.dvt.joblisting.model.submodel.Playlist;
+import com.dvt.coursesweb.model.submodel.Avatar;
+import com.dvt.coursesweb.model.submodel.Playlist;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;

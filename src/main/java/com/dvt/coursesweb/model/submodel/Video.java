@@ -1,16 +1,13 @@
-package com.dvt.joblisting.model.submodel;
+package com.dvt.coursesweb.model.submodel;
 
-public class Avatar {
+public class Video {
     private String public_id;
     private String url;
 
-    public Avatar(String public_id, String url) {
+    public Video(){}
+    public Video(String public_id, String url) {
         this.public_id = public_id;
         this.url = url;
-    }
-
-    public Avatar() {
-
     }
 
     public String getPublic_id() {

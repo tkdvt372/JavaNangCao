@@ -1,4 +1,4 @@
-package com.dvt.joblisting.ultis;
+package com.dvt.coursesweb.ultis;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

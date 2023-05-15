@@ -1,9 +1,7 @@
-package com.dvt.joblisting.model.submodel;
+package com.dvt.coursesweb.model.submodel;
 
-import com.dvt.joblisting.model.Course;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 public class Playlist {
     @Id

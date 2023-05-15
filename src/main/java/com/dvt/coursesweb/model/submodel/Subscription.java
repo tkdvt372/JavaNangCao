@@ -1,4 +1,4 @@
-package com.dvt.joblisting.model.submodel;
+package com.dvt.coursesweb.model.submodel;
 
 import java.util.Date;
 

@@ -1,20 +1,16 @@
-package com.dvt.joblisting.ultis;
+package com.dvt.coursesweb.ultis;
 
-import com.dvt.joblisting.model.User;
+import com.dvt.coursesweb.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 
 public class SendToken {

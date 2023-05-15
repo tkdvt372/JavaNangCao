@@ -1,12 +1,12 @@
-package com.dvt.joblisting.service;
+package com.dvt.coursesweb.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.dvt.joblisting.model.User;
-import com.dvt.joblisting.model.submodel.Avatar;
-import com.dvt.joblisting.repository.UserReposiroty;
-import com.dvt.joblisting.ultis.ErrorHandler;
-import com.dvt.joblisting.ultis.SendToken;
+import com.dvt.coursesweb.model.User;
+import com.dvt.coursesweb.model.submodel.Avatar;
+import com.dvt.coursesweb.repository.UserReposiroty;
+import com.dvt.coursesweb.ultis.ErrorHandler;
+import com.dvt.coursesweb.ultis.SendToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;

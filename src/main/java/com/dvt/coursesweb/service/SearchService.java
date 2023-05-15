@@ -1,10 +1,9 @@
-package com.dvt.joblisting.service;
+package com.dvt.coursesweb.service;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.dvt.joblisting.model.Course;
-import com.dvt.joblisting.repository.CourseRepository;
-import com.dvt.joblisting.repository.SearchRepository;
+import com.dvt.coursesweb.model.Course;
+import com.dvt.coursesweb.repository.CourseRepository;
+import com.dvt.coursesweb.repository.SearchRepository;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -14,9 +13,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

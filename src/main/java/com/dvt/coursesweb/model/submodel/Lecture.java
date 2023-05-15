@@ -1,9 +1,7 @@
-package com.dvt.joblisting.model.submodel;
+package com.dvt.coursesweb.model.submodel;
 
-import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 public class Lecture {
     @Id
