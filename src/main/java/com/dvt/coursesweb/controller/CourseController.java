@@ -42,7 +42,7 @@ public class CourseController {
     //Gat all courses
     @GetMapping("/courses")
     @CrossOrigin
-    public ResponseEntity<List<Course>> getAllCourses(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "category", required = false) String category) {
+    public ResponseEntity getAllCourses(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "category", required = false) String category) {
         if (title == null && category == null) {
             List<Course> listCourses = repo.findAll();
             List<Course> output = listCourses.stream()
@@ -56,9 +56,12 @@ public class CourseController {
                             , course.getCreatedBy()
                             , course.getCreatedAt()
                     )).collect(Collectors.toList());
-            return new ResponseEntity<List<Course>>(output, HttpStatus.OK);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("courses", output);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<List<Course>>(srepo.getAllCourse(title, category), HttpStatus.OK);
+        return new ResponseEntity(srepo.getAllCourse(title, category), HttpStatus.OK);
     }
 
 

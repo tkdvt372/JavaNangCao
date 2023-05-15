@@ -12,6 +12,8 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -33,7 +35,7 @@ public class SearchService implements SearchRepository {
     }
 
     @Override
-    public List<Course> getAllCourse(String title, String category) {
+    public ResponseEntity getAllCourse(String title, String category) {
 
         final List<Course> listCourses = new ArrayList<>();
 
@@ -59,7 +61,10 @@ public class SearchService implements SearchRepository {
                             , course.getCreatedBy()
                             , course.getCreatedAt()
                     )).collect(Collectors.toList());
-            return output;
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("courses", output);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else if (category == null) {
             AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
                     new Document("text",
@@ -77,7 +82,10 @@ public class SearchService implements SearchRepository {
                             , course.getCreatedBy()
                             , course.getCreatedAt()
                     )).collect(Collectors.toList());
-            return output;
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("courses", output);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }else if(title == null){
             AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
                     new Document("text",
@@ -96,7 +104,10 @@ public class SearchService implements SearchRepository {
                             , course.getCreatedBy()
                             , course.getCreatedAt()
                     )).collect(Collectors.toList());
-            return output;
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("courses", output);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         return null;
 
