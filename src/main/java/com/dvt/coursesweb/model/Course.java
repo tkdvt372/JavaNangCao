@@ -2,21 +2,19 @@ package com.dvt.coursesweb.model;
 
 import com.dvt.coursesweb.model.submodel.Lecture;
 import com.dvt.coursesweb.model.submodel.Poster;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Data
 @Document(collection = "courses")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Course {
     @Id
-    private ObjectId id;
+    private String id;
     private String title;
     private String description;
     private List<Lecture> lectures;
@@ -29,6 +27,20 @@ public class Course {
     private Date createdAt;
     public Course(){
         this.createdAt = new Date();
+        id = new ObjectId().toString();
+        lectures = new ArrayList<>();
+    }
+
+    public Course(String id, String title, String description, Poster poster, int views, int numOfVideos, String category, String createdBy, Date createdAt) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.poster = poster;
+        this.views = views;
+        this.numOfVideos = numOfVideos;
+        this.category = category;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
     }
 
     public Course(String title, String description, List<Lecture> lectures, Poster poster, int views, int numOfVideos, String category, String createdBy, Date createdAt) {
@@ -44,9 +56,6 @@ public class Course {
 
     }
 
-    public ObjectId getId() {
-        return id;
-    }
 
     public Course(String title, String description, Poster poster, int views, int numOfVideos, String category, String createdBy, Date createdAt) {
         this.title = title;
@@ -130,5 +139,9 @@ public class Course {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getId() {
+        return id;
     }
 }

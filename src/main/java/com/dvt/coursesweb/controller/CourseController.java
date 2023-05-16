@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000",allowCredentials = "true")
 @RequestMapping("/api/v1")
 public class CourseController {
     @Autowired
@@ -42,12 +42,13 @@ public class CourseController {
     //Gat all courses
     @GetMapping("/courses")
     @CrossOrigin
-    public ResponseEntity getAllCourses(@RequestParam(value = "title", required = false) String title, @RequestParam(value = "category", required = false) String category) {
-        if (title == null && category == null) {
+    public ResponseEntity getAllCourses(@RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value = "category", required = false) String category) {
+        if (keyword.isEmpty() && category.isEmpty()) {
             List<Course> listCourses = repo.findAll();
             List<Course> output = listCourses.stream()
                     .map(course -> new Course(
-                            course.getTitle()
+                            course.getId()
+                            , course.getTitle()
                             , course.getDescription()
                             , course.getPoster()
                             , course.getViews()
@@ -61,7 +62,7 @@ public class CourseController {
             response.put("courses", output);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity(srepo.getAllCourse(title, category), HttpStatus.OK);
+        return new ResponseEntity(srepo.getAllCourse(keyword, category), HttpStatus.OK);
     }
 
 
@@ -72,7 +73,11 @@ public class CourseController {
         Course temp = new Course();
         temp.setTitle(title);
         temp.setDescription(description);
-        temp.setCategory(category);
+        if(category.isEmpty() || category == " " || category == null){
+            temp.setCategory("Phát triển web");
+        }else{
+            temp.setCategory(category);
+        }
         temp.setCreatedBy(createdBy);
         Poster a = new Poster(r.get("public_id").toString(), r.get("secure_url").toString());
         temp.setPoster(a);
@@ -88,12 +93,15 @@ public class CourseController {
     public ResponseEntity getCourseLecture(@PathVariable ObjectId id) {
         Optional<Course> course = srepo.singleCourse(id);
         if (course.isEmpty()) {
-            return ErrorHandler.Log("Không tìm thấy khoá học",HttpStatus.NOT_FOUND);
+            return ErrorHandler.Log("Không tìm thấy khoá học", HttpStatus.NOT_FOUND);
         }
-        int views = course.get().getViews()+1;
+        int views = course.get().getViews() + 1;
         course.get().setViews(views);
         repo.save(course.get());
-        return new ResponseEntity<>(course.get().getLectures(), HttpStatus.OK);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("lectures", course.get().getLectures());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -102,7 +110,7 @@ public class CourseController {
     public ResponseEntity addLecture(@RequestParam("file") MultipartFile file, @RequestParam("title") String title, @RequestParam("description") String description, @PathVariable ObjectId id) throws IOException {
         Optional<Course> temp = srepo.singleCourse(id);
         if (temp.isEmpty()) {
-            return ErrorHandler.Log("Không tìm thấy khoá học",HttpStatus.NOT_FOUND);
+            return ErrorHandler.Log("Không tìm thấy khoá học", HttpStatus.NOT_FOUND);
         }
         Course course = temp.get();
         if (course.getLectures() == null) {
@@ -125,7 +133,7 @@ public class CourseController {
                 response.put("success", true);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } catch (Exception e) {
-                return ErrorHandler.Log("Thêm bài giảng thất bại",HttpStatus.BAD_REQUEST);
+                return ErrorHandler.Log("Thêm bài giảng thất bại", HttpStatus.BAD_REQUEST);
             }
         } else {
             Map r = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "video"));
@@ -147,7 +155,7 @@ public class CourseController {
                 response.put("success", true);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } catch (Exception e) {
-                return ErrorHandler.Log("Thêm khoá học thất bại",HttpStatus.BAD_REQUEST);
+                return ErrorHandler.Log("Thêm khoá học thất bại", HttpStatus.BAD_REQUEST);
             }
         }
     }
@@ -157,7 +165,7 @@ public class CourseController {
     public ResponseEntity deleteCourse(@PathVariable ObjectId id) throws IOException {
         Optional<Course> temp = srepo.singleCourse(id);
         if (temp.isEmpty()) {
-            return ErrorHandler.Log("Không tìm thấy khoá học",HttpStatus.NOT_FOUND);
+            return ErrorHandler.Log("Không tìm thấy khoá học", HttpStatus.NOT_FOUND);
         }
         Course course = temp.get();
         cloudinary.uploader().destroy(course.getPoster().getPublic_id(), ObjectUtils.asMap("resource_type", "image"));
@@ -175,7 +183,7 @@ public class CourseController {
             response.put("success", true);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return ErrorHandler.Log("Xoá khoá học thất bại",HttpStatus.BAD_REQUEST);
+            return ErrorHandler.Log("Xoá khoá học thất bại", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -185,7 +193,7 @@ public class CourseController {
     public ResponseEntity deleteLecture(@RequestParam("courseId") ObjectId courseId, @RequestParam("lectureId") ObjectId lectureId) throws IOException {
         Optional<Course> temp = srepo.singleCourse(courseId);
         if (temp.isEmpty()) {
-            return ErrorHandler.Log("Không tìm thấy khoá học",HttpStatus.NOT_FOUND);
+            return ErrorHandler.Log("Không tìm thấy khoá học", HttpStatus.NOT_FOUND);
         }
         Course course = temp.get();
         List<Lecture> lectures = course.getLectures();
@@ -210,7 +218,7 @@ public class CourseController {
             response.put("success", true);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return ErrorHandler.Log("Xoá bài giảng thất bại",HttpStatus.BAD_REQUEST);
+            return ErrorHandler.Log("Xoá bài giảng thất bại", HttpStatus.BAD_REQUEST);
         }
     }
 }

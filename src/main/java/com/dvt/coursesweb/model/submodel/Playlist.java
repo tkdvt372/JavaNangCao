@@ -5,34 +5,33 @@ import org.springframework.data.annotation.Id;
 
 public class Playlist {
     @Id
-    private ObjectId id;
-    private ObjectId course;
+    private String id;
+    private String course;
 
     private String poster;
     public Playlist(){
-        this.id= new ObjectId();
-        this.course = new ObjectId();
+        id= new ObjectId().toString();
     }
 
-    public Playlist(ObjectId id, ObjectId course, String poster) {
+    public Playlist(String id, String course, String poster) {
         this.id = id;
         this.course = course;
         this.poster = poster;
     }
 
-    public ObjectId getCourse() {
+    public String getCourse() {
         return course;
     }
 
-    public void setCourse(ObjectId course) {
+    public void setCourse(String course) {
         this.course = course;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(ObjectId id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -5,12 +5,12 @@ import org.springframework.data.annotation.Id;
 
 public class Lecture {
     @Id
-    private ObjectId id;
+    private String id;
     private String title;
     private String description;
     private Video video;
     public Lecture(){
-        id = new ObjectId();
+        this.id = new ObjectId().toString();
     }
 
     public Lecture(String title, String description, Video video) {
@@ -19,7 +19,7 @@ public class Lecture {
         this.video = video;
     }
 
-    public ObjectId getId() {
+    public String getId() {
         return id;
     }
 

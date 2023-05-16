@@ -17,11 +17,7 @@ import java.util.Map;
 public class UserController {
     @Autowired
     UserSevice userSevice;
-    @GetMapping("/admin/users")
-    public ResponseEntity getAllUsers(){
 
-        return new ResponseEntity(userSevice.getAllUsers(), HttpStatus.OK);
-    }
 
     //Register
     @PostMapping("/register")
@@ -88,5 +84,27 @@ public class UserController {
         return userSevice.updateProfilePicture(request,file);
     }
 
-    //
+    //Add to playlist
+    @PostMapping("/add-to-playlist")
+    public ResponseEntity addToPlaylist(HttpServletRequest request,@RequestBody Map<String, Object> requestBody){
+        String id = (String) requestBody.get("id");
+        return userSevice.addToPlaylist(request,id);
+    }
+
+    //Remove a course from playlist
+    @DeleteMapping("/remove-from-playlist")
+    public ResponseEntity removeFromPlaylist(HttpServletRequest request,@RequestParam("id") String id){
+        return userSevice.RemoveFromPlaylist(request,id);
+    }
+
+    @PostMapping("/forget-password")
+    public ResponseEntity forgetPassword(@RequestBody Map<String, Object> requestBody){
+        String email = (String) requestBody.get("email");;
+        return userSevice.forgetPassword(email);
+    }
+    @PutMapping("/reset-password/{token}")
+    public ResponseEntity resetPassword(@RequestBody Map<String, Object> requestBody,@PathVariable String token){
+        String password = (String) requestBody.get("password");;
+        return userSevice.resetPassword(password,token);
+    }
 }

@@ -35,16 +35,16 @@ public class SearchService implements SearchRepository {
     }
 
     @Override
-    public ResponseEntity getAllCourse(String title, String category) {
+    public ResponseEntity getAllCourse(String keyword, String category) {
 
         final List<Course> listCourses = new ArrayList<>();
 
         MongoDatabase database = client.getDatabase("courses-web");
         MongoCollection<Document> collection = database.getCollection("courses");
-        if (title != null && category != null) {
+        if (keyword != null && category != null) {
             AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
                     new Document("text",
-                            new Document("query", title)
+                            new Document("query", keyword)
                                     .append("path", "title"))
                             .append("text",
                                     new Document("query", category)
@@ -68,7 +68,7 @@ public class SearchService implements SearchRepository {
         } else if (category == null) {
             AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
                     new Document("text",
-                            new Document("query", title)
+                            new Document("query", keyword)
                                     .append("path", "title")))));
             result.forEach(doc -> listCourses.add(converter.read(Course.class, doc)));
             List<Course> output = listCourses.stream()
@@ -86,7 +86,7 @@ public class SearchService implements SearchRepository {
             response.put("success", true);
             response.put("courses", output);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }else if(title == null){
+        }else if(keyword == null){
             AggregateIterable<Document> result = collection.aggregate(Arrays.asList(new Document("$search",
                     new Document("text",
                             new Document("query", category)

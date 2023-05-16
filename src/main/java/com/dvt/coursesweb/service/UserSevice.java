@@ -2,10 +2,14 @@ package com.dvt.coursesweb.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.dvt.coursesweb.model.Course;
 import com.dvt.coursesweb.model.User;
 import com.dvt.coursesweb.model.submodel.Avatar;
+import com.dvt.coursesweb.model.submodel.Playlist;
+import com.dvt.coursesweb.repository.CourseRepository;
 import com.dvt.coursesweb.repository.UserReposiroty;
 import com.dvt.coursesweb.ultis.ErrorHandler;
+import com.dvt.coursesweb.ultis.SendEmail;
 import com.dvt.coursesweb.ultis.SendToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,10 +24,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Component
 public class UserSevice {
@@ -33,10 +38,9 @@ public class UserSevice {
     UserReposiroty userReposiroty;
     @Autowired
     Cloudinary cloudinary;
+    @Autowired
+    CourseRepository courseRepository;
 
-    public List<User> getAllUsers() {
-        return userReposiroty.findAll();
-    }
 
     public ResponseEntity Register(HttpServletResponse res, MultipartFile file, String name, String email, String password) throws Exception {
         User temp = new User();
@@ -129,8 +133,7 @@ public class UserSevice {
                             .getBody();
 
                     String userId = claims.getSubject();
-                    Optional<User> userTemp = userReposiroty.findById(userId);
-                    User user = userTemp.get();
+                    User user = userReposiroty.findById(userId).get();
                     Map<String, Object> response = new HashMap<>();
                     response.put("success", true);
                     response.put("user", user);
@@ -145,7 +148,7 @@ public class UserSevice {
     //Change password
     public ResponseEntity ChangePassword(HttpServletRequest request, String oldPassword, String newPassword) {
         if (oldPassword == " " || newPassword == " ") {
-            ErrorHandler.Log("Vui lòng nhập đầy đủ thông tin", HttpStatus.BAD_REQUEST);
+            return ErrorHandler.Log("Vui lòng nhập đầy đủ thông tin", HttpStatus.BAD_REQUEST);
         }
         String encodednewPassword = passwordEncoder.encode(newPassword);
         Cookie[] cookies = request.getCookies();
@@ -162,8 +165,7 @@ public class UserSevice {
                             .getBody();
 
                     String userId = claims.getSubject();
-                    Optional<User> userTemp = userReposiroty.findById(userId);
-                    User user = userTemp.get();
+                    User user = userReposiroty.findById(userId).get();
                     if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
                         return ErrorHandler.Log("Mật khẩu cũ không chính xác", HttpStatus.BAD_REQUEST);
                     } else {
@@ -202,8 +204,7 @@ public class UserSevice {
                             .getBody();
 
                     String userId = claims.getSubject();
-                    Optional<User> userTemp = userReposiroty.findById(userId);
-                    User user = userTemp.get();
+                    User user = userReposiroty.findById(userId).get();
                     if (name != " ") {
                         user.setName(name);
                     }
@@ -229,7 +230,7 @@ public class UserSevice {
     }
 
 
-    public  ResponseEntity updateProfilePicture(HttpServletRequest request, MultipartFile file) {
+    public ResponseEntity updateProfilePicture(HttpServletRequest request, MultipartFile file) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -244,8 +245,7 @@ public class UserSevice {
                             .getBody();
 
                     String userId = claims.getSubject();
-                    Optional<User> userTemp = userReposiroty.findById(userId);
-                    User user = userTemp.get();
+                    User user = userReposiroty.findById(userId).get();
                     try {
                         Map r = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap("resource_type", "image"));
                         Map e = cloudinary.uploader().destroy(user.getAvatar().getPublic_id(), ObjectUtils.asMap("resource_type", "image"));
@@ -268,6 +268,189 @@ public class UserSevice {
             }
         }
         return new ResponseEntity("Cookie not found", HttpStatus.NOT_FOUND);
+    }
+
+    public ResponseEntity RemoveFromPlaylist(HttpServletRequest request, String id) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    String secret = "duongvantuanduongvantuanduongvantuanduongvantuan";
+
+                    Claims claims = Jwts.parserBuilder()
+                            .setSigningKey(secret)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
+
+                    String userId = claims.getSubject();
+                    User user = userReposiroty.findById(userId).get();
+                    boolean check = false;
+                    int index = -1;
+                    for (Playlist playlist : user.getPlaylist()
+                    ) {
+                        if (playlist.getCourse().equals(id)) {
+                            check = true;
+                            index = user.getPlaylist().indexOf(playlist);
+                        }
+                    }
+
+                    if (check == true && index >= 0) {
+                        List<Playlist> playlists = user.getPlaylist();
+                        playlists.remove(index);
+                        user.setPlaylist(playlists);
+                    }
+                    if (check == false) {
+                        return ErrorHandler.Log("Khoá học không có trong danh sách yêu thích", HttpStatus.BAD_REQUEST);
+                    }
+                    try {
+                        userReposiroty.save(user);
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Bỏ yêu thích thành công!");
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    } catch (Exception e) {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", false);
+                        response.put("message", "Bỏ yêu thích thất bại");
+                        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+        }
+        return new ResponseEntity("Cookie not found", HttpStatus.NOT_FOUND);
+    }
+
+
+    public ResponseEntity addToPlaylist(HttpServletRequest request, String id) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    String secret = "duongvantuanduongvantuanduongvantuanduongvantuan";
+
+                    Claims claims = Jwts.parserBuilder()
+                            .setSigningKey(secret)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
+
+                    String userId = claims.getSubject();
+                    User user = userReposiroty.findById(userId).get();
+                    Course course = courseRepository.findById(id).get();
+
+                    if (user.getPlaylist() == null) {
+                        user.setPlaylist(new ArrayList<>());
+                    }
+                    for (Playlist playlist : user.getPlaylist()
+                    ) {
+                        if (playlist.getId().equals(course.getId())) {
+                            return ErrorHandler.Log("Khoá học đã tồn tại", HttpStatus.BAD_REQUEST);
+                        }
+                    }
+                    List<Playlist> playlists = user.getPlaylist();
+                    Playlist temp = new Playlist();
+                    temp.setCourse(course.getId());
+                    temp.setPoster(course.getPoster().getUrl());
+                    playlists.add(temp);
+                    user.setPlaylist(playlists);
+
+                    try {
+                        userReposiroty.save(user);
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Thêm vào danh sách ưa thích thành công!");
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    } catch (Exception e) {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", false);
+                        response.put("message", "Thêm vào danh sách ưa thích thất bại");
+                        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+        }
+        return new ResponseEntity("Cookie not found", HttpStatus.NOT_FOUND);
+    }
+
+
+    public ResponseEntity forgetPassword(String email) {
+        List<User> users = userReposiroty.findAll();
+        for (User user : users
+        ) {
+            if (user.getEmail().equals(email)) {
+                try {
+                    String resetToken = user.getResetToken();
+                    userReposiroty.save(user);
+                    String url = "http://localhost:3000/reset-password/" + resetToken + "";
+                    String message = "Nhấn vào link để đặt lại mật khẩu: " + url + "\n.Nếu bạn không có yêu cầu gì hãy bỏ qua";
+                    SendEmail.sendEmail(user.getEmail(), "ĐẶT LẠI MẬT KHẨU", message);
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("message", "Reset Token đã được gửi đến" + user.getEmail() + "");
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                } catch (Exception e) {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", false);
+                    response.put("message", "Gửi Reset Token thất bại");
+                    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                }
+            }
+        }
+        return new ResponseEntity("Email không liên kết với tài khoản nào!", HttpStatus.NOT_FOUND);
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (byte b : bytes) {
+            stringBuilder.append(String.format("%02x", b));
+        }
+        return stringBuilder.toString();
+    }
+
+    private String generateHash(String input) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = messageDigest.digest(input.getBytes());
+            return bytesToHex(hashBytes);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ResponseEntity resetPassword(String password, String token) {
+        String resetPasswordToken = generateHash(token);
+        LocalDateTime currentTime = LocalDateTime.now();
+        List<User> users = userReposiroty.findAll();
+        for (User user : users
+        ) {
+            if(user.getResetPasswordExpire() != ""){
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime time = LocalDateTime.parse(user.getResetPasswordExpire(), formatter);
+                if (user.getResetPasswordToken().equals(resetPasswordToken) && (currentTime.isBefore(time))) {
+                    String encodednewPassword = passwordEncoder.encode(password);
+                    user.setPassword(encodednewPassword);
+                    try {
+                        userReposiroty.save(user);
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Đổi mật khẩu thành công");
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        System.out.println(e.getStackTrace());
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", false);
+                        response.put("message", "Đổi mật khẩu thất bại");
+                        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+        }
+        return new ResponseEntity("Token không đúng hoặc hết hạn!", HttpStatus.NOT_FOUND);
     }
 
 }
