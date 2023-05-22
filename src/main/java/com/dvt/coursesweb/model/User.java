@@ -141,7 +141,6 @@ public class User{
     }
 
     public String getResetToken() {
-        System.out.println("Làm mới reset token");
         String resetToken = generateRandomToken();
         this.resetPasswordToken = generateHash(resetToken);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
