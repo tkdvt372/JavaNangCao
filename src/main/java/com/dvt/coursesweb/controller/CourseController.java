@@ -62,7 +62,7 @@ public class CourseController {
             response.put("courses", output);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity(srepo.getAllCourse(keyword, category), HttpStatus.OK);
+        return srepo.getAllCourse(keyword, category);
     }
 
 

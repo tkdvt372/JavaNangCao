@@ -90,6 +90,42 @@ public class PayPalController {
 
     }
 
+    @DeleteMapping("/subscribe/cancel")
+    public ResponseEntity  cancelSubscription(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    String token = cookie.getValue();
+                    String secret = "duongvantuanduongvantuanduongvantuanduongvantuan";
+
+                    Claims claims = Jwts.parserBuilder()
+                            .setSigningKey(secret)
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
+
+                    String userId = claims.getSubject();
+                    User user = userReposiroty.findById(userId).get();
+                    try {
+                        Subscription temp = new Subscription();
+                        temp.setId(null);
+                        temp.setStatus(null);
+                        user.setSubscription(temp);
+                        userReposiroty.save(user);
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("success", true);
+                        response.put("message", "Huỷ thành viên thành công");
+                        return new ResponseEntity<>(response, HttpStatus.OK);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }
+        return new ResponseEntity("Không tìm thấy tài khoản", HttpStatus.NOT_FOUND);
+    }
 
     @GetMapping("/success")
     public void successPay(HttpServletRequest request, HttpServletResponse response, @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
@@ -131,4 +167,5 @@ public class PayPalController {
             }
         }
     }
+
 }
